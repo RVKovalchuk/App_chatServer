@@ -7,6 +7,8 @@ import java.util.Scanner;
 //создаем класс клиента, имплементирующий интерфейс Runnable.
 public class Client implements Runnable{
     //выносим общее.
+    String name = "Person";
+    static int numberOfPerson = 0;
     Socket socket;
     chatServer server;
     Scanner in;
@@ -15,6 +17,7 @@ public class Client implements Runnable{
     public Client(Socket socket, chatServer server) {
         this.socket = socket;
         this.server = server;
+        this.name = name + " # " + ++numberOfPerson;
         //создаем объект класса Thread и передаем ему клиента, запускаем Thread.
         new Thread(this).start();
     }
@@ -32,16 +35,16 @@ public class Client implements Runnable{
             OutputStream os = socket.getOutputStream();
             //используем поток вывода для вывода приветствия в чат.
             out = new PrintStream(os);
-            out.println("Welcome to the club Buddy.");
+            out.println("Welcome to the club " + this.name);
             //используем поток ввода для ввода клиентами текста в чат.
             in = new Scanner(is);
             String input = in.nextLine();
             //ввод/вывод работают до тех пор, пока не будет введено "bb".
             while (!input.equals("bb")) {
                 //рассылаем сообщение всем клиентам.
-                server.sendForAllClient(input);
+                server.sendForAllClient(this.name + " : " + input);
                 //обновляем проверямое сообщение на вводе (для сравнения с "bb").
-                input = in.nextLine();
+                input =in.nextLine();
             }
             //закрываем поток.
             socket.close();
